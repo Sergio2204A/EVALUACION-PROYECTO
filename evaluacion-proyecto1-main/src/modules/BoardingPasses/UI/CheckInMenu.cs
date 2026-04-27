@@ -116,12 +116,16 @@ public class CheckInMenu
                 
                 Console.WriteLine("\n--- CHECK-IN EXITOSO ---");
                 Console.WriteLine("--- PASE DE ABORDAR GENERADO ---");
-                Console.WriteLine($"Código:           {bp.BoardingCode}");
-                Console.WriteLine($"Puerta:           {bp.Gate}");
+                Console.WriteLine($"Código del pase:  {bp.BoardingCode}");
+                Console.WriteLine($"Pasajero:         {details.PassengerName}");
+                Console.WriteLine($"Vuelo:            {details.FlightCode}");
                 Console.WriteLine($"Asiento:          {bp.Seat}");
+                Console.WriteLine($"Puerta:           {bp.Gate}");
                 Console.WriteLine($"Hora de abordaje: {bp.BoardingTime}");
-                Console.WriteLine($"Estado:           {bp.Status}");
-                Console.WriteLine("\nEl estado del tiquete se ha actualizado a 'Check-in realizado'.");
+                Console.WriteLine($"Estado del pase:  {bp.Status}");
+                
+                Console.WriteLine("\nGuardado exitoso en base de datos (MySQL).");
+                Console.WriteLine("El estado del tiquete se ha actualizado a 'Check-in realizado'.");
             }
             else
             {
@@ -130,7 +134,7 @@ public class CheckInMenu
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"\nError en el proceso: {ex.Message}");
+            Console.WriteLine($"\n{ex.Message}");
         }
 
         Console.WriteLine("\nPresione tecla para continuar...");

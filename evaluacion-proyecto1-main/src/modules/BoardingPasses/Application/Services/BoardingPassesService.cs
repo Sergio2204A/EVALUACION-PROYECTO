@@ -85,40 +85,48 @@ public class BoardingPassesService : IBoardingPassesService
         if (ticket == null)
             throw new Exception("Tiquete o reserva no encontrado.");
 
-        // 1. Verificar que el tiquete no tenga ya el estado Check-in realizado
+        // 1. Verificar si el check-in ya fue realizado
         var existingBp = await _repository.GetByTicketIdAsync(ticket.Id);
         if (existingBp != null || ticket.StatusId == AppDbContextSeedData.IdTkStCheckIn)
         {
-            throw new Exception("El check-in ya fue realizado para este tiquete.");
+            throw new Exception("Error: check-in ya realizado.");
         }
 
-        // 2. Verificar que el tiquete esté emitido o pagado
-        if (ticket.StatusId != AppDbContextSeedData.IdTkStIssued && ticket.StatusId != AppDbContextSeedData.IdTkStPagado)
-            throw new Exception($"El tiquete no está en estado emitido o pagado. (Estado actual: {ticket.Status.Name})");
+        // 2. Verificar que el tiquete esté emitido
+        // Nota: Si el estado es "Cancelado", mostrar mensaje correspondiente
+        if (ticket.Status.Name == "Cancelado")
+            throw new Exception("Error: tiquete cancelado.");
 
-        // 3. Verificar que el pago esté en estado pagado (validamos si hay pagos registrados para la reserva)
+        if (ticket.StatusId != AppDbContextSeedData.IdTkStIssued && ticket.StatusId != AppDbContextSeedData.IdTkStPagado && ticket.StatusId != AppDbContextSeedData.IdTkStCheckIn)
+            throw new Exception("Error: tiquete no emitido.");
+
+        // 3. Verificar pagos (pago pendiente)
         var payments = await _context.Payments
             .Where(p => p.ReservationId == ticket.ReservationPassenger.ReservationId)
             .ToListAsync();
             
         if (!payments.Any())
-            throw new Exception("La reserva asociada al tiquete no registra pagos realizados.");
+            throw new Exception("Error: pago pendiente.");
 
-        // 4. Verificar que el vuelo esté vigente y habilitado
+        // 4. Verificar estado del vuelo
         var flight = ticket.ReservationPassenger.Reservation.Flight;
-        if (flight.Status.Name != "Programado" && flight.Status.Name != "En vuelo")
-            throw new Exception($"El vuelo no está habilitado para check-in (Estado actual: {flight.Status.Name}).");
+        
+        if (flight.Status.Name == "Cancelado")
+            throw new Exception("Error: vuelo cancelado.");
 
-        // 5. Validar que la fecha y hora del vuelo permitan hacer check-in (ej: máximo 48 horas antes)
+        if (flight.Status.Name != "Programado" && flight.Status.Name != "En vuelo")
+            throw new Exception("Error: vuelo no habilitado.");
+
+        // 5. Verificar tiempo permitido (fuera del tiempo permitido)
         var now = DateTime.UtcNow;
         if (flight.DepartureTime < now)
-            throw new Exception("El vuelo ya ha salido.");
+            throw new Exception("Error: fuera del tiempo permitido (el vuelo ya salió).");
         
         if (flight.DepartureTime > now.AddDays(2))
-            throw new Exception("El check-in solo está permitido 48 horas antes de la salida.");
+            throw new Exception("Error: fuera del tiempo permitido (muy temprano para check-in).");
 
         if (string.IsNullOrEmpty(flight.Gate))
-            throw new Exception("El vuelo no tiene una puerta de embarque asignada aún.");
+            throw new Exception("Error: vuelo no habilitado (puerta no asignada).");
 
         // 6. Confirmar que el pasajero tenga asiento asignado; si no lo tiene, asignarlo
         string seat = ticket.ReservationPassenger.SeatNumber;
