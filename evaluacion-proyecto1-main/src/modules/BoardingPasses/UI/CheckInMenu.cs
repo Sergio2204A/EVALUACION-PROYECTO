@@ -50,28 +50,55 @@ public class CheckInMenu
         Console.Write("Ingrese el número de tiquete o ID de reserva: ");
         string identifier = Console.ReadLine() ?? "";
 
-        if (!string.IsNullOrWhiteSpace(identifier))
-        {
-            try
-            {
-                var bp = await _service.ProcessCheckInAsync(identifier);
-                Console.WriteLine("\n--- PASE DE ABORDAR GENERADO ---");
-                Console.WriteLine($"Código: {bp.BoardingCode}");
-                Console.WriteLine($"Puerta: {bp.Gate}");
-                Console.WriteLine($"Asiento: {bp.Seat}");
-                Console.WriteLine($"Hora de abordaje: {bp.BoardingTime}");
-                Console.WriteLine($"Estado: {bp.Status}");
-                Console.WriteLine("\nEl estado del tiquete se ha actualizado a 'Check-in realizado'.");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"\nError al realizar Check-in: {ex.Message}");
-            }
-        }
-        else
+        if (string.IsNullOrWhiteSpace(identifier))
         {
             Console.WriteLine("Identificador inválido.");
+            Console.ReadKey();
+            return;
         }
+
+        try
+        {
+            // 1. Buscar y mostrar los datos del pasajero y del vuelo
+            var details = await _service.GetCheckInDetailsAsync(identifier);
+            
+            Console.WriteLine("\n--- DATOS PARA EL CHECK-IN ---");
+            Console.WriteLine($"Pasajero:    {details.PassengerName}");
+            Console.WriteLine($"Vuelo:       {details.FlightCode}");
+            Console.WriteLine($"Origen:      {details.Origin}");
+            Console.WriteLine($"Destino:     {details.Destination}");
+            Console.WriteLine($"Salida:      {details.DepartureTime}");
+            Console.WriteLine($"Tiquete:     {details.TicketNumber}");
+            Console.WriteLine($"Estado:      {details.TicketStatus}");
+            Console.WriteLine($"Asiento:     {details.SeatNumber}");
+            
+            Console.WriteLine("\n¿Desea proceder con el Check-in? (S/N): ");
+            var confirmation = Console.ReadLine()?.ToUpper();
+
+            if (confirmation == "S")
+            {
+                // 2. Realizar validaciones y check-in
+                var bp = await _service.ProcessCheckInAsync(identifier);
+                
+                Console.WriteLine("\n--- CHECK-IN EXITOSO ---");
+                Console.WriteLine("--- PASE DE ABORDAR GENERADO ---");
+                Console.WriteLine($"Código:           {bp.BoardingCode}");
+                Console.WriteLine($"Puerta:           {bp.Gate}");
+                Console.WriteLine($"Asiento:          {bp.Seat}");
+                Console.WriteLine($"Hora de abordaje: {bp.BoardingTime}");
+                Console.WriteLine($"Estado:           {bp.Status}");
+                Console.WriteLine("\nEl estado del tiquete se ha actualizado a 'Check-in realizado'.");
+            }
+            else
+            {
+                Console.WriteLine("\nProceso cancelado por el usuario.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"\nError en el proceso: {ex.Message}");
+        }
+
         Console.WriteLine("\nPresione tecla para continuar...");
         Console.ReadKey();
     }
