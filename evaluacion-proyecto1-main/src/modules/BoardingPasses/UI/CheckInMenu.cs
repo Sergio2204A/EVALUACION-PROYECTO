@@ -25,7 +25,8 @@ public class CheckInMenu
             Console.WriteLine("1. Realizar Check-in (Generar Pase)");
             Console.WriteLine("2. Consultar Pase de Abordar");
             Console.WriteLine("3. Consultar Pasajeros Listos para Abordar");
-            Console.WriteLine("4. Volver");
+            Console.WriteLine("4. Registrar Abordaje (Boarding)");
+            Console.WriteLine("5. Volver");
             Console.WriteLine("=========================================");
             Console.Write("Seleccione: ");
 
@@ -34,13 +35,46 @@ public class CheckInMenu
                 case "1": await PerformCheckInAsync(); break;
                 case "2": await ViewBoardingPassAsync(); break;
                 case "3": await QueryReadyToBoardAsync(); break;
-                case "4": isRunning = false; break;
+                case "4": await PerformBoardingAsync(); break;
+                case "5": isRunning = false; break;
                 default: 
                     Console.WriteLine("Opción no válida.");
                     Console.ReadKey();
                     break;
             }
         }
+    }
+
+    private async Task PerformBoardingAsync()
+    {
+        Console.Clear();
+        Console.WriteLine("--- Proceso de Abordaje (Boarding) ---");
+        Console.Write("Ingrese el código del pase de abordar (ej: BP-1234): ");
+        string code = Console.ReadLine() ?? "";
+
+        if (string.IsNullOrWhiteSpace(code))
+        {
+            Console.WriteLine("Código inválido.");
+            Console.ReadKey();
+            return;
+        }
+
+        try
+        {
+            var success = await _service.ProcessBoardingAsync(code);
+            if (success)
+            {
+                Console.WriteLine("\n¡Abordaje registrado exitosamente!");
+                Console.WriteLine("El estado del tiquete se ha actualizado a 'Abordado'.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"\nError al registrar abordaje: {ex.Message}");
+        }
+
+        Console.WriteLine("\nPresione tecla para continuar...");
+        Console.ReadKey();
     }
 
     private async Task PerformCheckInAsync()

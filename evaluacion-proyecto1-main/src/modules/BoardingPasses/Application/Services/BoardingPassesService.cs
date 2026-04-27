@@ -154,4 +154,28 @@ public class BoardingPassesService : IBoardingPassesService
 
         return boardingPass;
     }
+
+    public async Task<bool> ProcessBoardingAsync(string boardingCode)
+    {
+        var boardingPass = await _repository.GetByCodeAsync(boardingCode);
+        if (boardingPass == null)
+            throw new Exception("Pase de abordar no encontrado.");
+
+        if (boardingPass.Status != "Ready to board")
+            throw new Exception($"El pase de abordar no está en estado para abordar (Estado: {boardingPass.Status}).");
+
+        var ticket = await _context.Tickets.FindAsync(boardingPass.TicketId);
+        if (ticket == null)
+            throw new Exception("Tiquete asociado no encontrado.");
+
+        // Marcar como abordado
+        boardingPass.MarkAsBoarded();
+        ticket.StatusId = AppDbContextSeedData.IdTkStAbordado;
+
+        await _repository.UpdateAsync(boardingPass);
+        _context.Tickets.Update(ticket);
+        await _context.SaveChangesAsync();
+
+        return true;
+    }
 }

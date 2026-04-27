@@ -29,4 +29,9 @@ public class BoardingPass
     {
         return new BoardingPass(ticketId, gate, seat, boardingTime);
     }
+
+    public void MarkAsBoarded()
+    {
+        Status = "Boarded";
+    }
 }

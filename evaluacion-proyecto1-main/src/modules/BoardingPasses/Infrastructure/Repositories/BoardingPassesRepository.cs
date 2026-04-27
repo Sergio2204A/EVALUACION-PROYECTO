@@ -45,4 +45,23 @@ public class BoardingPassesRepository : IBoardingPassesRepository
 
         return entities.Select(BoardingPassMapper.ToDomain);
     }
+
+    public async Task<BoardingPass?> GetByCodeAsync(string boardingCode)
+    {
+        var entity = await _context.BoardingPasses
+            .FirstOrDefaultAsync(bp => bp.BoardingCode == boardingCode);
+        
+        return entity == null ? null : BoardingPassMapper.ToDomain(entity);
+    }
+
+    public async Task UpdateAsync(BoardingPass boardingPass)
+    {
+        var entity = await _context.BoardingPasses.FindAsync(boardingPass.Id);
+        if (entity != null)
+        {
+            entity.Status = boardingPass.Status;
+            _context.BoardingPasses.Update(entity);
+            await _context.SaveChangesAsync();
+        }
+    }
 }

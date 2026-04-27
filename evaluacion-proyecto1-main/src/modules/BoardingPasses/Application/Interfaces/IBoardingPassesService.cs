@@ -23,4 +23,5 @@ public interface IBoardingPassesService
     Task<BoardingPass?> GetBoardingPassAsync(string ticketNumberOrReservationId);
     Task<IEnumerable<BoardingPass>> GetReadyToBoardAsync(Guid flightId);
     Task<CheckInDetailsDto> GetCheckInDetailsAsync(string ticketNumberOrReservationId);
+    Task<bool> ProcessBoardingAsync(string boardingCode);
 }

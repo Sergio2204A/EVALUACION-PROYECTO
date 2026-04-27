@@ -10,4 +10,6 @@ public interface IBoardingPassesRepository
     Task AddAsync(BoardingPass boardingPass);
     Task<IEnumerable<BoardingPass>> GetReadyToBoardAsync(Guid flightId);
     Task<BoardingPass?> GetByTicketIdAsync(Guid ticketId);
+    Task<BoardingPass?> GetByCodeAsync(string boardingCode);
+    Task UpdateAsync(BoardingPass boardingPass);
 }
