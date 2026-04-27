@@ -10,6 +10,7 @@ public class BoardingPass
     public string Gate { get; private set; }
     public string Seat { get; private set; }
     public DateTime BoardingTime { get; private set; }
+    public DateTime CheckInTime { get; private set; }
     public string Status { get; private set; }
     
     private BoardingPass() { }
@@ -22,6 +23,7 @@ public class BoardingPass
         Gate = gate;
         Seat = seat;
         BoardingTime = boardingTime;
+        CheckInTime = DateTime.UtcNow;
         Status = "Ready to board";
     }
 

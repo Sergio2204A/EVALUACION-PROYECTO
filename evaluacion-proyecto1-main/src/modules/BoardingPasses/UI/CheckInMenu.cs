@@ -185,20 +185,34 @@ public class CheckInMenu
         Console.Clear();
         Console.WriteLine("--- Consultar Pasajeros Listos para Abordar ---");
         Console.Write("Ingrese el ID del Vuelo (GUID): ");
-        if (Guid.TryParse(Console.ReadLine(), out Guid flightId))
+        string flightInput = Console.ReadLine() ?? "";
+        
+        if (Guid.TryParse(flightInput, out Guid flightId))
         {
+            Console.WriteLine("\n¿Cómo desea ordenar la lista?");
+            Console.WriteLine("1. Por asiento (por defecto)");
+            Console.WriteLine("2. Por hora de check-in");
+            string sortOption = Console.ReadLine() == "2" ? "time" : "seat";
+
             try
             {
-                var passengers = await _service.GetReadyToBoardAsync(flightId);
-                Console.WriteLine("\nLista de pases de abordar listos:");
+                var passengers = await _service.GetReadyToBoardAsync(flightId, sortOption);
+                
+                Console.WriteLine("\n" + new string('-', 100));
+                Console.WriteLine($"{"Nombre",-25} | {"Documento",-15} | {"Asiento",-8} | {"Tiquete",-15} | {"Estado",-15}");
+                Console.WriteLine(new string('-', 100));
+
                 int count = 0;
                 foreach (var p in passengers)
                 {
-                    Console.WriteLine($"- Código: {p.BoardingCode} | Asiento: {p.Seat} | Puerta: {p.Gate}");
+                    Console.WriteLine($"{p.PassengerName,-25} | {p.DocumentNumber,-15} | {p.SeatNumber,-8} | {p.TicketNumber,-15} | {p.Status,-15}");
                     count++;
                 }
                 
-                if(count == 0) Console.WriteLine("No hay pasajeros listos para este vuelo.");
+                if (count == 0) 
+                    Console.WriteLine("No hay pasajeros listos para este vuelo.");
+                else
+                    Console.WriteLine(new string('-', 100) + $"\nTotal: {count} pasajeros.");
             }
             catch (Exception ex)
             {
@@ -207,7 +221,7 @@ public class CheckInMenu
         }
         else
         {
-            Console.WriteLine("ID inválido.");
+            Console.WriteLine("ID de vuelo inválido.");
         }
         Console.WriteLine("\nPresione tecla para continuar...");
         Console.ReadKey();

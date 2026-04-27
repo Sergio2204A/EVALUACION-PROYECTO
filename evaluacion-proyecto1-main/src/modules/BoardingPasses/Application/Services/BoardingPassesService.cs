@@ -21,9 +21,34 @@ public class BoardingPassesService : IBoardingPassesService
         _context = context;
     }
 
-    public async Task<IEnumerable<BoardingPass>> GetReadyToBoardAsync(Guid flightId)
+    public async Task<IEnumerable<ReadyToBoardDto>> GetReadyToBoardAsync(Guid flightId, string sortBy = "seat")
     {
-        return await _repository.GetReadyToBoardAsync(flightId);
+        var entities = await _context.BoardingPasses
+            .Include(bp => bp.Ticket)
+                .ThenInclude(t => t.ReservationPassenger)
+                    .ThenInclude(rp => rp.Customer)
+            .Include(bp => bp.Ticket)
+                .ThenInclude(t => t.ReservationPassenger)
+                    .ThenInclude(rp => rp.Reservation)
+            .Where(bp => bp.Ticket.ReservationPassenger.Reservation.FlightId == flightId && bp.Status == "Ready to board")
+            .ToListAsync();
+
+        var query = entities.Select(bp => new ReadyToBoardDto
+        {
+            BoardingCode = bp.BoardingCode,
+            PassengerName = bp.Ticket.ReservationPassenger.Customer.FullName,
+            DocumentNumber = bp.Ticket.ReservationPassenger.Customer.DocumentNumber,
+            SeatNumber = bp.Seat,
+            TicketNumber = bp.Ticket.TicketNumber,
+            Status = bp.Status,
+            BoardingTime = bp.BoardingTime,
+            CheckInTime = bp.CheckInTime
+        });
+
+        if (sortBy == "time")
+            return query.OrderBy(q => q.CheckInTime);
+        
+        return query.OrderBy(q => q.SeatNumber);
     }
 
     public async Task<BoardingPass?> GetBoardingPassAsync(string ticketNumberOrReservationId)

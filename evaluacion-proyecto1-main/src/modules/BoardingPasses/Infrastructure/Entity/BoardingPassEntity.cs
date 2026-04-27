@@ -11,6 +11,7 @@ public class BoardingPassEntity
     public string Gate { get; set; } = string.Empty;
     public string Seat { get; set; } = string.Empty;
     public DateTime BoardingTime { get; set; }
+    public DateTime CheckInTime { get; set; }
     public string Status { get; set; } = string.Empty; // e.g. "Boarding", "Ready"
 
     // Navigation property

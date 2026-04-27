@@ -15,6 +15,7 @@ public static class BoardingPassMapper
             Gate = domain.Gate,
             Seat = domain.Seat,
             BoardingTime = domain.BoardingTime,
+            CheckInTime = domain.CheckInTime,
             Status = domain.Status
         };
     }
@@ -29,6 +30,7 @@ public static class BoardingPassMapper
         typeof(BoardingPass).GetProperty("Gate")?.SetValue(bp, entity.Gate);
         typeof(BoardingPass).GetProperty("Seat")?.SetValue(bp, entity.Seat);
         typeof(BoardingPass).GetProperty("BoardingTime")?.SetValue(bp, entity.BoardingTime);
+        typeof(BoardingPass).GetProperty("CheckInTime")?.SetValue(bp, entity.CheckInTime);
         typeof(BoardingPass).GetProperty("Status")?.SetValue(bp, entity.Status);
         
         return bp;
