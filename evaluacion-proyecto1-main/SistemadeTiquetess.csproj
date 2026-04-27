@@ -1,0 +1,57 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.5" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0" />
+  </ItemGroup>
+
+  <!-- El resto de src/modules no compila (dominios incompletos, referencias rotas). Solo las entidades EF. -->
+  <ItemGroup>
+    <Compile Remove="src\modules\**\*.cs" />
+    <Compile Include="src\modules\**\Entity\*Entity.cs" />
+    <Compile Include="src\modules\BoardingPasses\**\*.cs" Exclude="src\modules\BoardingPasses\**\*Entity.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+    <Folder Include="src\" />
+    <Folder Include="src\modules\" />
+    <Folder Include="src\modules\Aircrafts\Application\interfaces\" />
+    <Folder Include="src\modules\Aircrafts\Application\Services\" />
+    <Folder Include="src\modules\Aircrafts\Application\UseCases\" />
+    <Folder Include="src\modules\Aircrafts\Domain\Aggregate\" />
+    <Folder Include="src\modules\Aircrafts\Domain\Repositories\" />
+    <Folder Include="src\modules\Aircrafts\Domain\valueObject\" />
+    <Folder Include="src\modules\Aircrafts\infrastructure\Entity\" />
+    <Folder Include="src\modules\Aircrafts\infrastructure\Repositories\" />
+    <Folder Include="src\modules\Countries\Application\" />
+    <Folder Include="src\modules\Countries\Application\Interfaces\" />
+    <Folder Include="src\modules\Countries\Application\services\" />
+    <Folder Include="src\modules\Countries\Application\usecases\" />
+    <Folder Include="src\modules\Countries\Domain\" />
+    <Folder Include="src\modules\Countries\Infrastructure\" />
+    <Folder Include="src\modules\Countries\UI\" />
+    <Folder Include="src\shared\" />
+    <Folder Include="src\shared\configuration\" />
+    <Folder Include="src\shared\context\" />
+    <Folder Include="src\shared\contracts\" />
+    <Folder Include="src\shared\helpers\" />
+    <Folder Include="src\shared\ui\" />
+    <Folder Include="src\shared\ui\Menus\" />
+  </ItemGroup>
+
+</Project>
